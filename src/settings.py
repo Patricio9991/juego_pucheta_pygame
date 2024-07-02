@@ -1,7 +1,7 @@
 import pygame
 
 #fps
-FPS = 60
+FPS = 10
 
 #imagenes
 PANEL_TOP = 150
@@ -18,9 +18,13 @@ PANELES = (0,HEIGHT-PANEL_TOP)
 
 #font
 pygame.font.init()
-FONT = pygame.font.SysFont("Times New Roman",26)
+FONT = pygame.font.SysFont("Times New Roman",20)
 
 
 #colors
 RED = (255,0,0)
 GREEN = (0,255,0)
+WHITE = (255,255,255)
+
+
+
