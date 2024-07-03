@@ -1,5 +1,5 @@
 import pygame
-
+import os
 
 def draw(screen,img,coordenadas):
     screen.blit(img, coordenadas)
@@ -35,8 +35,8 @@ def scale_image(new_size,images):
 
 
 def cargar_imagenes(folder_name):
-    import os
-
+    
+    
     lista_imagenes = []
 
     
@@ -77,7 +77,7 @@ def calcular_radio(rect):
 
 
 
-def detectar_colision_circulo(rect1,rect2)->bool:
+def detectar_colision(rect1,rect2)->bool:
     
 
     r1 = calcular_radio(rect1)
