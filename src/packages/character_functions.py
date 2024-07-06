@@ -66,7 +66,7 @@ def animate_character(personaje:dict,accion:bool = None):
             if frame >= len(personaje["animation_list"][2]):
                 frame = 0
 
-            personaje["animation"] = personaje["animation_list"][2][int(frame)] 
+            personaje["animation"] = personaje["animation_list"][2][frame] 
 
             
             
@@ -132,16 +132,16 @@ def attack(pj:dict,target:dict)->None:
         target['alive'] = False
 
 def heal(pj:dict)->None:
-    """_Funcion para utlizar posiones y aumentar la salud
+    """_Funcion para utlizar posiones y recuperar la salud
 
     Args:
         pj (dict): diccionario de personaje que utiliza la key/value de las posiones para aumentar la salud del personaje
     """
     restore_points = 10
     if pj["potions"]:
-        pj["potions"] =-1
+        pj["potions"] -=1
 
-        if pj["hp"]+ restore_points < pj["max_hp"]:
+        if pj["hp"] + restore_points < pj["max_hp"]:
             pj["hp"] += restore_points
         elif pj["hp"] + restore_points >= pj["max_hp"]:
             pj["hp"] = pj["max_hp"]

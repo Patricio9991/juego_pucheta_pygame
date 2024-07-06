@@ -37,3 +37,14 @@ GOLD = (212,175,55)
 
 #tamaño personaje
 MAP_CHARACTER_SIZE = (50,50)
+
+
+#volumen sonido
+MUSIC_VOLUME = 0.08
+
+
+#flags menu
+go_to_map = False
+map = True
+play = True
+

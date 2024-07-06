@@ -91,3 +91,5 @@ def detectar_colision(rect1,rect2)->bool:
 def punto_en_rectangulo(punto,rect)->bool:
 
     return punto[0] >= rect.left and punto[0] <= rect.right and punto[1] >= rect.top and punto[1] <= rect.bottom
+
+

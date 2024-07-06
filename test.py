@@ -1,17 +1,9 @@
 
 
-list = []
 
-aux = []
+enemy_dict = [{"enemie":"en1","años":"44"},{"enemie2":"en2","años":"44"}]
 
-for i in range(2):
-    
-    for j in range(3):
-        aux.append(j)
-        
-    print(aux)
-    list.append(aux)
+enemy_dict.remove(enemy_dict[1])
 
+print(enemy_dict)
 
-
-[[0, 1, 2, 0, 1, 2], [0, 1, 2, 0, 1, 2]]
