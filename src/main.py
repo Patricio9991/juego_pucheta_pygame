@@ -6,7 +6,7 @@ import sys
 
 from settings  import *
 from packages.screen_functions import punto_en_rectangulo,draw_text
-from gameplay_functions import main_gameplay_screen
+from packages.gameplay_functions import *
 
 
 
@@ -15,6 +15,9 @@ pygame.init()
 SCREEN = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption('Battle Fantasy')
 
+backgrounds = cargar_imagenes("backgrounds")
+menu_img = backgrounds[0][0]
+scaled_menu_bg =  scale_image(SCREEN_SIZE,menu_img)
 
 
 while play:
@@ -27,13 +30,11 @@ while play:
                 if punto_en_rectangulo(event.pos,play_btn):
                    go_to_map = True
 
-    if go_to_map:
+    if go_to_map: 
         main_gameplay_screen(SCREEN,map)
 
 
-
-
-    SCREEN.fill(WHITE)
+    draw(SCREEN,scaled_menu_bg,(0,0))
     play_btn = draw_text(SCREEN,"Play",FONT,BLACK,SCREEN_CENTER)
 
 

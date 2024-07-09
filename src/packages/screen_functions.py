@@ -25,17 +25,36 @@ def draw_bg_layers(screen,bg_list,coordenadas):
     for i in range(len(bg_list)):
         screen.blit(bg_list[i], coordenadas)
         
-def scale_image(new_size,images):
+def scale_image(new_size:tuple,images:list | pygame.Surface,many:bool = False):
+    """escala una lista de imagenes dada, o una imagen individual
+    new_size: tupla con el tamaño nuevo
+    images: lista de imagenes (surfaces) o una sola surface
+    many: bool. False retorna una imagen, True reorna una lista de imagenes
+
+    Returns:
+        list: lista de imagenes escaladas al tamaño pasado por parametro
+    """
     scaled_images = []
-    for i in range(len(images)):
-        scaled_images.append(pygame.transform.scale(images[i],new_size))
-    
-    return scaled_images
+
+    if many:
+        for i in range(len(images)):
+            scaled_images.append(pygame.transform.scale(images[i],new_size))
+        
+        return scaled_images
+    else:
+        return pygame.transform.scale(images,new_size)
 
 
 
-def cargar_imagenes(folder_name):
-    
+def cargar_imagenes(folder_name:int):
+    """Carga una lista las imagenes de una carpeta a partir de las subcarpetas que la integran
+    recomendacion: usar una notacion numeral en la carpeta contenedora para clarificar el acceso a los elementos de la lista
+    Args:
+        folder_name (int): nombre de la carpeta contenedora
+
+    Returns:
+        list[list]: lista de subcarpetas donde cada indice contiene sus imagenes
+    """
     
     lista_imagenes = []
 

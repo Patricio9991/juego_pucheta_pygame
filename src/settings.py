@@ -1,5 +1,5 @@
 import pygame
-
+from packages.screen_functions import cargar_imagenes
 #fps
 FPS = 10
 
@@ -47,4 +47,5 @@ MUSIC_VOLUME = 0.08
 go_to_map = False
 map = True
 play = True
+
 

@@ -7,19 +7,26 @@ import sys
 from settings  import *
 from packages.screen_functions import *
 from packages.character_functions import *
-
 from personajes import *
 
 
+backgrounds = cargar_imagenes("backgrounds")
+scaled_bg_map = scale_image(SCREEN_SIZE,backgrounds[1],True)
 
+imagenes = cargar_imagenes("items")
+potion_img = imagenes[0][0]
+scaled_potion_img = scale_image((30,30),potion_img)
+
+extra_potion = extra_item(100,320,scaled_potion_img)
 
 def battle_screen(battle,SCREEN,enemie = 0):
     clock = pygame.time.Clock()
 
     #----load images-----
     #Background
-    backgorunds = [pygame.image.load('./src/assets/bg_0.png'), pygame.image.load('./src/assets/bg_1.png')]
-    scaled_bgs = scale_image(BG_SIZE_W_PANELS,backgorunds)
+    
+    scaled_bgs = scale_image(BG_SIZE_W_PANELS,backgrounds[0],True)
+
 
     #Panel
     panel = pygame.image.load('./src/assets/panel.png')
@@ -32,6 +39,7 @@ def battle_screen(battle,SCREEN,enemie = 0):
     enemie_phase = 1
     enemie_index = enemie
     enemy_focused = 0
+    next_battle = False
 
     #Actions Knight
     action_knight = False
@@ -95,13 +103,16 @@ def battle_screen(battle,SCREEN,enemie = 0):
                         pygame.mixer.music.unpause()
                         flag_mute = False
                     playing_music = not playing_music
+                if event.key == K_SPACE:
                     
-                if event.key == K_p:
-                    wait_user(K_p)
+                    next_battle = True
+            
+
 
         if flag_mute:
             draw_text(SCREEN,"Mute",FONT,GREEN,(400,500)) 
 
+        
         
 
         if el_cebolla["alive"]:
@@ -113,86 +124,83 @@ def battle_screen(battle,SCREEN,enemie = 0):
 
             if len(enemies[enemie_index]) > 0:
                 target = enemies[enemie_index][0]
-            else:
-                draw_text(SCREEN,"VICTORY",FONT,RED,SCREEN_CENTER)
-                turn_cooldown = 0
 
 
-            if turn_cooldown <= turn_wait_time and current_turn == 1:
-                turn_cooldown += 1
-                if action_knight and atk_flag:
-                    animate_character(el_cebolla,'a')
-                    attack(el_cebolla,target)
-                    print("atacar")
-                    action_knight = False
-                    turn_cooldown = 0
-                    current_turn += 1
 
-                elif action_knight and potion_flag:
-                    if el_cebolla["potions"] > 0:
-                        heal(el_cebolla)
-                    else:
-                        draw_text(SCREEN,"NO HAY MAS POSIONES",FONT,RED,(WIDTH//2,200))
-                        
-                        
-                    turn_cooldown = 0
-                    current_turn += 1
-            elif turn_cooldown >= turn_wait_time:
-                draw_text(SCREEN,"FIN DEL TURNO",FONT,RED,(WIDTH//2,200))
-                turn_cooldown = 0
-                current_turn += 1
+                if turn_cooldown <= turn_wait_time and current_turn == 1:
+                    turn_cooldown += 1
+                    if action_knight and atk_flag:
+                        animate_character(el_cebolla,'a')
+                        attack(el_cebolla,target)
+                        print("atacar")
+                        action_knight = False
+                        turn_cooldown = 0
+                        current_turn += 1
 
-            if current_turn > 1:
-                for enemie in enemies[enemie_index][:]:
-                    enemie_phase += 1
-                    if current_turn == enemie_phase:
-                        turn_cooldown += 1
-                        if enemie["alive"] and turn_cooldown >= enemy_turn_wait_time:
-                            animate_character(enemie,'a')
-                            attack(enemie,el_cebolla)
-                            turn_cooldown = 0
-                            current_turn += 1
+                    elif action_knight and potion_flag:
+                        if el_cebolla["potions"] > 0:
+                            heal(el_cebolla)
                         else:
-                            enemy_focused +=1
-                    elif enemie_phase > len(enemies[enemie_index]):
-                        enemie_phase = 1
+                            draw_text(SCREEN,"NO HAY MAS POSIONES",FONT,RED,(WIDTH//2,200))
+                            
+                            
+                        turn_cooldown = 0
+                        current_turn += 1
+                elif turn_cooldown >= turn_wait_time:
+                    draw_text(SCREEN,"FIN DEL TURNO",FONT,RED,(WIDTH//2,200))
+                    turn_cooldown = 0
+                    current_turn += 1
+
+                if current_turn > 1:
+                    for current_enemie in enemies[enemie_index][:]:
+                        enemie_phase += 1
+                        if current_turn == enemie_phase:
+                            turn_cooldown += 1
+                            if current_enemie["alive"] and turn_cooldown >= enemy_turn_wait_time:
+                                animate_character(current_enemie,'a')
+                                attack(current_enemie,el_cebolla)
+                                turn_cooldown = 0
+                                current_turn += 1
+                            else:
+                                enemy_focused +=1
+                        elif enemie_phase > len(enemies[enemie_index]):
+                            enemie_phase = 1
 
 
 
-            total_turnos = len(enemies[enemie_index])+1            
-                        
-            if current_turn > total_turnos:
-                current_turn = 1
-                action_knight = False
-                atk_flag = True
-                potion_flag = True
-                turn_cooldown = 0
+                total_turnos = len(enemies[enemie_index])+1            
+                            
+                if current_turn > total_turnos:
+                    current_turn = 1
+                    action_knight = False
+                    atk_flag = True
+                    potion_flag = True
+                    turn_cooldown = 0
 
+                
+                for i in range(len(enemies[enemie_index])):
+                    altura_nombre = (i+1) *40
+                    altura_barra_hp = i *45
+                    draw(SCREEN,pygame.transform.flip(enemies[enemie_index][i]["animation"],True,False),enemies[enemie_index][i]["rect"])
+                    write_panels(SCREEN,f"{enemies[enemie_index][i]["name"]} {enemies[enemie_index][i]["hp"]}",FONT,GREEN,(700,HEIGHT-PANEL_TOP + altura_nombre))
+                    health_bar(SCREEN,enemies[enemie_index][i]["hp"],enemies[enemie_index][i]["max_hp"],altura_barra_hp,False )
 
+                for current_enemie in enemies[enemie_index][:]:
+                    if current_enemie["hp"] <= 0:
+                        enemies[enemie_index].remove(current_enemie)
+            else:
+
+                    return True
 
             draw(SCREEN,el_cebolla["animation"],el_cebolla["rect"])
             write_panels(SCREEN,f"El cebolla {el_cebolla["hp"]}",FONT,GREEN,(100,HEIGHT-PANEL_TOP + 40))
             health_bar(SCREEN,el_cebolla["hp"],el_cebolla["max_hp"],ALTURA_BARRA_HP_BATTLE)
-
 
             pygame.draw.rect(SCREEN,WHITE,attack_btn,1)
             pygame.draw.rect(SCREEN,WHITE,potion_btn,1)
             pygame.draw.rect(SCREEN,WHITE,huir_btn,1)
             pygame.draw.rect(SCREEN,WHITE,pass_btn,1)
 
-
-            
-            for i in range(len(enemies[enemie_index])):
-                altura_nombre = (i+1) *40
-                altura_barra_hp = i *45
-                draw(SCREEN,pygame.transform.flip(enemies[enemie_index][i]["animation"],True,False),enemies[enemie_index][i]["rect"])
-                write_panels(SCREEN,f"{enemies[enemie_index][i]["name"]} {enemies[enemie_index][i]["hp"]}",FONT,GREEN,(700,HEIGHT-PANEL_TOP + altura_nombre))
-                health_bar(SCREEN,enemies[enemie_index][i]["hp"],enemies[enemie_index][i]["max_hp"],altura_barra_hp,False )
-
-            for enemie in enemies[enemie_index][:]:
-                if enemie["hp"] <= 0:
-                    enemies[enemie_index].remove(enemie)
-                
 
         else:
             SCREEN.fill(BLACK)
@@ -203,13 +211,20 @@ def battle_screen(battle,SCREEN,enemie = 0):
             pygame.draw.rect(SCREEN,WHITE,yes_btn,1)
             pygame.draw.rect(SCREEN,WHITE,no_btn,1)
 
-        
 
+        
         pygame.display.flip()
+    
+
+        
 
 
 def main_gameplay_screen(SCREEN,map,battle = False):
     clock = pygame.time.Clock()
+
+
+    
+
 
     move_down = False
     move_left = False
@@ -217,6 +232,11 @@ def main_gameplay_screen(SCREEN,map,battle = False):
     move_up = False
     movement_speed = 15
 
+    spawn_heal = False
+
+    SPAWNHEALEVENT = USEREVENT + 1 
+
+    pygame.time.set_timer(SPAWNHEALEVENT,5000)
 
     if map:
         pygame.mixer.music.load("./src/assets/audio/map_song.mp3")
@@ -229,107 +249,77 @@ def main_gameplay_screen(SCREEN,map,battle = False):
 
         clock.tick(FPS)
 
+        draw_bg_layers(SCREEN,scaled_bg_map,(0,0))
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 sys.exit()
             if evento.type == pygame.KEYDOWN:
-                    print("keydown")
-                    if evento.key == K_SPACE:
-                        map = False
-                        battle = True
-
                     if evento.key == K_LEFT:
-                        print("Flecha izquieda")
                         move_left = True
                         move_right = False
 
                     if evento.key == K_RIGHT:
-                        print("Flecha derecha")
                         move_right = True
                         move_left = False
 
                     if evento.key == K_UP:
-                        print("Flecha arriba")
                         move_up = True
 
                     if evento.key == K_DOWN:
-                        print("Flecha aabajo")
                         move_down = True
 
             if evento.type == pygame.KEYUP:
-                print("keydown")
                 if evento.key == K_LEFT:
-                    print("Flecha izquieda")
                     move_left = False
 
                 if evento.key == K_RIGHT:
-                    print("Flecha derecha")
                     move_right = False
 
                 if evento.key == K_UP:
-                    print("Flecha arriba")
                     move_up = False
 
                 if evento.key == K_DOWN:
-                    print("Flecha aabajo")
                     move_down = False
-
-
-
-
-        SCREEN.fill((255,255,255))
-        
-        
-        if move_right and el_cebolla["map_image_rect"].right < WIDTH:
-            print(el_cebolla["map_image_rect"].right)
-            if el_cebolla["map_image_rect"].right > WIDTH:
-                el_cebolla["map_image_rect"].right = WIDTH
-            el_cebolla["map_image_rect"].right += movement_speed
-        
-        if move_left and el_cebolla["map_image_rect"].left > 0:
-            print(el_cebolla["map_image_rect"].left)
-            if el_cebolla["map_image_rect"].left < 0:
-                el_cebolla["map_image_rect"].right = 0
-            el_cebolla["map_image_rect"].left -= movement_speed
             
-        
-        if move_down and el_cebolla["map_image_rect"].bottom < HEIGHT:
-            if el_cebolla["map_image_rect"].bottom > HEIGHT:
-                el_cebolla["map_image_rect"].bottom = HEIGHT
-            print(el_cebolla["map_image_rect"].bottom)
-            el_cebolla["map_image_rect"].bottom += movement_speed
-        
-        if move_up and el_cebolla["map_image_rect"].top > 0:
-            print(el_cebolla["map_image_rect"].top)
-            if el_cebolla["map_image_rect"].top < 0:
-                el_cebolla["map_image_rect"].top = 0
-            el_cebolla["map_image_rect"].top -= movement_speed
+            if evento.type == SPAWNHEALEVENT:
+                spawn_heal = True
 
 
-        
-        if move_left:
-            draw(SCREEN,pygame.transform.flip(el_cebolla["map_image"],True,False),el_cebolla["map_image_rect"])
-        else:
-            draw(SCREEN,el_cebolla["map_image"],el_cebolla["map_image_rect"])
+        check_movement(move_left,move_right,move_up,move_down,el_cebolla,WIDTH,HEIGHT,movement_speed,SCREEN)
 
-        for i in range(len(enemies[:])):
+
+        for i in range(len(enemies)):
 
             draw_enemie_in_map(SCREEN,el_cebolla,enemies[i])
             
             for j in range(len(enemies[i])):
                 if detectar_colision(el_cebolla["map_image_rect"], enemies[i][j]["map_image_rect"]):
-                        enemie_index = i #indice del tipo de enemigo que colisiono
-                        map = False
-                        battle = True
+                    enemie_index = i #indice del tipo de enemigo que colisiono
+                    map = False
+                    battle = True
 
-                        
-                        
+        if spawn_heal:
+            draw(SCREEN,extra_potion["img"],(100,320))
+    
+            if detectar_colision(el_cebolla["map_image_rect"],extra_potion["rect"]):  
+                el_cebolla["potions"] += 1
+                print("colision con la posion")
+                spawn_heal = False
+
 
         
         health_bar(SCREEN,el_cebolla["hp"],el_cebolla["max_hp"],ALTURA_BARRA_HP_MAP)
         
 
         pygame.display.flip()
+
+
     
-    battle_screen(battle,SCREEN,enemie_index) if not map else ""
+    if not map:
+        battle_screen(battle,SCREEN,enemie_index)
+    
+    if battle_screen(battle,SCREEN,enemie_index):
+        battle = False
+        map = True
+        main_gameplay_screen(SCREEN,map,battle)

@@ -46,6 +46,18 @@ def new_personaje(x:int,y:int,nombre:str,hp:int,max_hp:int,str:int,potions:int,a
     return personaje
 
 
+def extra_item(x,y,img):
+    item = {
+        "coordenada_x" : x,
+        "coordenada_y" : y,
+        "img":img,
+        "rect" : img.get_rect()
+    }
+
+    item["rect"].center = x,y
+
+    return item
+
 
 def animate_character(personaje:dict,accion:bool = None):
     """Anima un personaje segun parametro accion
@@ -175,5 +187,39 @@ def draw_enemie_in_map(screen:pygame.Surface,pj:dict,enemie_list:list[list])->No
 
 
 
+
+def check_movement(left,right,top,bottom,rect,width,heigth,speed,SCREEN):
+    
+        
+    if right and rect["map_image_rect"].right < width:
+        stay_flip = False
+        if rect["map_image_rect"].right > width:
+            rect["map_image_rect"].right = width
+        rect["map_image_rect"].right += speed
+    
+    if left and rect["map_image_rect"].left > 0:
+        if rect["map_image_rect"].left < 0:
+            rect["map_image_rect"].right = 0
+        rect["map_image_rect"].left -= speed
+
+    if bottom and rect["map_image_rect"].bottom < heigth:
+        if rect["map_image_rect"].bottom > heigth:
+            rect["map_image_rect"].bottom = heigth
+        print(rect["map_image_rect"].bottom)
+        rect["map_image_rect"].bottom += speed
+    
+    if top and rect["map_image_rect"].top > 0:
+        print(rect["map_image_rect"].top)
+        if rect["map_image_rect"].top < 0:
+            rect["map_image_rect"].top = 0
+        rect["map_image_rect"].top -= speed
+
+
+    
+    if left:
+        draw(SCREEN,pygame.transform.flip(rect["map_image"],True,False),rect["map_image_rect"])
+    else:
+        draw(SCREEN,rect["map_image"],rect["map_image_rect"])
+    
 
 
