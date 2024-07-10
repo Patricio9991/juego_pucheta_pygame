@@ -34,12 +34,11 @@ def new_personaje(x:int,y:int,nombre:str,hp:int,max_hp:int,str:int,potions:int,a
         "map_image_rect": pygame.transform.scale(animation_list[0][0],MAP_CHARACTER_SIZE).get_rect(),
         "animation":animation_list[1][0],
         "rect": animation_list[1][0].get_rect(),
+        "special_atk": 5
     }
     personaje["rect"].center = x,y
-    personaje["map_image_rect"].x = randint(0, WIDTH - x)
-    personaje["map_image_rect"].y = randint(0, HEIGHT - y)
-    
-
+    personaje["map_image_rect"].x = randint(0, WIDTH - personaje["map_image_rect"].right)
+    personaje["map_image_rect"].y = randint(0, HEIGHT - personaje["map_image_rect"].bottom)
     
     
 
@@ -57,6 +56,9 @@ def extra_item(x,y,img):
     item["rect"].center = x,y
 
     return item
+
+def special_power(x,y,img):
+    return extra_item(x,y,img)
 
 
 def animate_character(personaje:dict,accion:bool = None):
@@ -127,18 +129,23 @@ def health_bar(screen:pygame.Surface,hp:int,max_hp:int,altura:int = 0,player:boo
          
 
 
-def attack(pj:dict,target:dict)->None:
+def attack(pj:dict,target:dict,special = False)->None:
     """Funcion que calcula el daño de un personaje cuando a ataca a otro
 
     Args:
         pj (dict): diccionario de personaje atacante
         target (dict): diccionario de personaje objetivo
+        special (bool): Cuando es ataque especial. Hace mas daño
     """
 
-    damage_total = pj["str"]
+    damage_normal = pj["str"]
+    damage_special = damage_normal + 30
 
-    target["hp"] -= damage_total
-
+    if special:
+        target["hp"] -= damage_special
+    else:
+        target["hp"] -= damage_normal
+    
     if target['hp']<1:
         target['hp'] = 0
         target['alive'] = False
@@ -149,7 +156,7 @@ def heal(pj:dict)->None:
     Args:
         pj (dict): diccionario de personaje que utiliza la key/value de las posiones para aumentar la salud del personaje
     """
-    restore_points = 10
+    restore_points = 20
     if pj["potions"]:
         pj["potions"] -=1
 
@@ -192,14 +199,13 @@ def check_movement(left,right,top,bottom,rect,width,heigth,speed,SCREEN):
     
         
     if right and rect["map_image_rect"].right < width:
-        stay_flip = False
         if rect["map_image_rect"].right > width:
             rect["map_image_rect"].right = width
         rect["map_image_rect"].right += speed
     
     if left and rect["map_image_rect"].left > 0:
         if rect["map_image_rect"].left < 0:
-            rect["map_image_rect"].right = 0
+            rect["map_image_rect"].left = 0
         rect["map_image_rect"].left -= speed
 
     if bottom and rect["map_image_rect"].bottom < heigth:
@@ -211,7 +217,7 @@ def check_movement(left,right,top,bottom,rect,width,heigth,speed,SCREEN):
     if top and rect["map_image_rect"].top > 0:
         print(rect["map_image_rect"].top)
         if rect["map_image_rect"].top < 0:
-            rect["map_image_rect"].top = 0
+            rect["map_image_rect"].top = 100
         rect["map_image_rect"].top -= speed
 
 

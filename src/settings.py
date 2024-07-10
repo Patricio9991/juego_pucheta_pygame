@@ -23,7 +23,8 @@ ALTURA_BARRA_HP_BATTLE = 520
 
 #font
 pygame.font.init()
-FONT = pygame.font.SysFont("Times New Roman",20)
+FONT_SIZE = 20
+FONT = pygame.font.SysFont("Times New Roman",FONT_SIZE)
 
 
 #colors
@@ -47,5 +48,10 @@ MUSIC_VOLUME = 0.08
 go_to_map = False
 map = True
 play = True
+
+
+SPECIAL_ITEM_SIZE = (30,30)
+SPECIAL_THUNDER_SIZE = (200,200)
+ALTURA_SPECIAL_AVAILABLE = (600,20)
 
 
